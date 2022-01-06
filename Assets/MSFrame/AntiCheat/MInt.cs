@@ -14,6 +14,7 @@ namespace MSFrame.AntiCheat
         }
         public static int Random(int min, int max)
         {
+            if (min > max) return random.Next(max, min);
             return random.Next(min, max);
         }
         public static int Random(int max)
