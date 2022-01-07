@@ -32,31 +32,26 @@ namespace MSFrame.AntiCheat
     /// </summary>
     public struct MInt
     {
-        internal int[] iList;
-        internal int publicValue;
+        internal int[] ints;
+        internal int pValue;
         public int Value
         {
             get
             {
-                int a = 0;
-                for (int i = 0; i < iList.Length; i++)
-                {
-                    a += iList[i];
-                }
-                return a;
+                return ints.Sum();
             }
 
             set
             {
-                if (Value != publicValue)
+                if (Value != pValue)
                 {
                     //Cheat Detected
                 }
 
                 int offset = value - Value;
-                iList[SimpleRandom.Random(0, iList.Length - 1)] += offset;
+                ints[SimpleRandom.Random(0, ints.Length - 1)] += offset;
 
-                publicValue = value;
+                pValue = value;
             }
         }
 
@@ -67,12 +62,12 @@ namespace MSFrame.AntiCheat
 
         public MInt(int value, int arrayLength)
         {
-            publicValue = value;
-            iList = new int[arrayLength];
+            pValue = value;
+            ints = new int[arrayLength];
             int t = value / arrayLength;
-            for (int i = 0; i < arrayLength - 1; i++) iList[i] = SimpleRandom.Random(-t, t);
-            iList[iList.Length - 1] = 0;
-            iList[iList.Length - 1] = value - Value;
+            for (int i = 0; i < arrayLength - 1; i++) ints[i] = SimpleRandom.Random(-t, t);
+            ints[ints.Length - 1] = 0;
+            ints[ints.Length - 1] = value - Value;
         }
     }
 
