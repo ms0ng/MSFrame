@@ -13,11 +13,6 @@ namespace MSFrame.FSM
         string Name { get; }
 
         /// <summary>
-        /// 状态标签
-        /// </summary>
-        string Tag { set; get; }
-
-        /// <summary>
         /// 所属状态机
         /// </summary>
         IStateMachine Parent { get; set; }
