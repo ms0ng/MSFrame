@@ -111,6 +111,11 @@ namespace MSFrame.AntiCheat
 
         public override string ToString() => Value.ToString();
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public override bool Equals(object obj) => Value.Equals(obj is MInt ? ((MInt)obj).Value : obj);
     }
 
