@@ -49,6 +49,7 @@ namespace MSFrame.FSM
         {
             _states = new List<IState>();
             _defaultState = state;
+            _currentState = _defaultState;
         }
 
         public bool AddState(IState state)
@@ -122,18 +123,15 @@ namespace MSFrame.FSM
             base.OnStateExit(next);
         }
         /// <summary>
-        /// TODO:忽略条件,强制变更状态机内的状态(未完成)
+        /// 忽略条件,强制变更状态机内的状态(未完成)
         /// </summary>
         /// <param name="next">下一个状态(机)</param>
-        [System.Obsolete]
         public void ForceTransferToState(IState next)
         {
-            base.OnStateExit(next);
-            //当前状态退出
+            IState prevState = _currentState;
             _currentState.OnStateExit(next);
-            next.OnStateEnter(_currentState);
-            //设置当前状态
             _currentState = next;
+            _currentState.OnStateEnter(prevState);
         }
 
         public override void OnStateUpdate(float deltaTime)

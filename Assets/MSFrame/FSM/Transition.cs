@@ -54,6 +54,7 @@ namespace MSFrame.FSM
             _name = name;
             _from = fromState;
             _to = toState;
+            if (fromState != null) fromState.AddTransition(this);
         }
         public Transition(string name, IState toState) : this(name, null, toState)
         {
