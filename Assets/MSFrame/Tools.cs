@@ -252,5 +252,17 @@ namespace MSFrame
             }
             return l;
         }
+
+        public static T GetLast<T>(this List<T> list)
+        {
+            if (list.Count < 1) return default(T);
+            return list[list.Count - 1];
+        }
+
+        public static T GetFirst<T>(this List<T> list)
+        {
+            if (list.Count < 1) return default(T);
+            return list[0];
+        }
     }
 }
