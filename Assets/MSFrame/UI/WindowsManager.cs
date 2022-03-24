@@ -4,11 +4,10 @@ using UnityEngine;
 
 namespace MSFrame.UI
 {
-    // 窗体的全局管理类
     public class WindowsManager : Singleton<WindowsManager>
     {
-        private Dictionary<string, Type> _registeredWindows = new Dictionary<string, Type>();
-        private List<IWindowEntity> mOpenedWindows = new List<IWindowEntity>();
+        private List<Type> _registeredWindows = new List<Type>();
+        private Dictionary<int, IWindowEntity> _openedWindows = new Dictionary<int, IWindowEntity>();
 
         private Transform _SpawnTransform;
 
@@ -22,75 +21,53 @@ namespace MSFrame.UI
             _SpawnTransform = transform;
         }
 
-        public void Hide(string windowName)
+        private List<Type> RegisterWindows()
         {
-
-            if (!IsOpen(windowName))
-            {
-                return;
-            }
-            var obj = Get(windowName);
-            mOpenedWindows.Remove(obj);
-            GameObject.Destroy(((MonoBehaviour)obj).gameObject);
-        }
-
-        public bool IsOpen(string windowName)
-        {
-            if (Get(windowName) != null) return true;
-            return false;
-        }
-
-        public IWindowEntity Get()
-        {
-            if (mOpenedWindows.Count < 1) return null;
-            return mOpenedWindows[mOpenedWindows.Count - 1];
-        }
-
-        public IWindowEntity Get(string windowName)
-        {
-            return GetAs<IWindowEntity>(windowName);
-        }
-
-        public T GetAs<T>(string windowName) where T : IWindowEntity
-        {
-            for (int i = 0; i < mOpenedWindows.Count; i++)
-            {
-                if (mOpenedWindows[i] == null)
-                {
-                    mOpenedWindows.RemoveAt(i);
-                    i--;
-                    continue;
-                }
-                if (windowName.Equals(mOpenedWindows[i].GetType().Name))
-                    return (T)mOpenedWindows[i];
-            }
-            return default(T);
-        }
-
-        public IWindowEntity Open(string windowName)
-        {
-            if (IsOpen(windowName)) return Get(windowName);
-            IWindowEntity window = (IWindowEntity)_registeredWindows[windowName];
-            window = GameObject.Instantiate(GetWindowPrefab(window), _SpawnTransform).GetComponent<IWindowEntity>();
-            mOpenedWindows.Add(window);
-            return window;
-        }
-
-        public virtual GameObject GetWindowPrefab(IWindowEntity window)
-        {
-            return window.WindowPrefab;
-        }
-
-        private void RegisterWindows()
-        {
-            var iWindow = typeof(IWindowEntity).FullName;
-            var types = typeof(IWindowEntity).Assembly.GetTypes();
+            Type[] types = typeof(IWindowEntity).Assembly.GetTypes();
+            string iWindow = typeof(IWindowEntity).FullName;
             foreach (var t in types)
             {
                 if (!t.IsClass || t.IsAbstract) continue;
-                if (t.GetInterface(iWindow) != null)
-                    _registeredWindows[t.Name] = t;
+                if (t.GetInterface(iWindow) == null) continue;
+
+                _registeredWindows.Add(t);
             }
+            return _registeredWindows;
+        }
+
+        public IWindowEntity Open(string windowName, object[] @params = null)
+        {
+            int key = windowName.GetHashCode();
+            if (_openedWindows.TryGetValue(key, out IWindowEntity entity)) return entity;
+
+            _registeredWindows.ForEach((type) =>
+            {
+                IWindowEntity e = (IWindowEntity)type;
+                if (e.WindowName.Equals(windowName)) entity = (IWindowEntity)type;
+            });
+            if (entity == null) return null;
+
+            entity = GameObject.Instantiate(entity.WindowPrefab, _SpawnTransform).GetComponent<IWindowEntity>();
+            entity.OnWindowOpen(@params);
+            _openedWindows.Add(key, entity);
+            return entity;
+        }
+
+        public void Close(string windowName)
+        {
+            IWindowEntity entity = Get(windowName);
+            if (entity == null) return;
+            _openedWindows.Remove(windowName.GetHashCode());
+            entity.OnWindowClose();
+            GameObject.Destroy(((MonoBehaviour)entity).gameObject);
+        }
+
+        public IWindowEntity Get(string windowName) => GetAs<IWindowEntity>(windowName);
+
+        public T GetAs<T>(string windowName) where T : IWindowEntity
+        {
+            if (_openedWindows.TryGetValue(windowName.GetHashCode(), out IWindowEntity entity)) return (T)entity;
+            return default(T);
         }
     }
 }
