@@ -19,6 +19,7 @@ namespace MSFrame
                 {
                     GameObject obj = new GameObject(typeof(T).Name);
                     instance = obj.AddComponent<T>();
+                    DontDestroyOnLoad(obj);
                 }
                 return instance;
             }
