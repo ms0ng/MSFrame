@@ -8,7 +8,7 @@ namespace MSFrame
     /// 单例，采用反射。稍微增加内存和性能消耗，但是支持构造方法私有。
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class SingletoneR<T> : IDisposable where T : class, new()
+    public class SingletonR<T> : IDisposable where T : class
     {
 
         private static T instance;
@@ -39,6 +39,10 @@ namespace MSFrame
                 }
                 return instance;
             }
+        }
+        protected SingletonR()
+        {
+            Init();
         }
         public virtual void Init() { }
         public virtual void Dispose()
