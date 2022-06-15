@@ -5,7 +5,7 @@ namespace MSFrame
     /// 非托管资源的单例基类
     /// </summary>
     /// <typeparam name="T">单例类型</typeparam>
-    public class Singleton<T> : System.IDisposable where T : new()
+    public class Singleton<T> where T : new()
     {
         private static T instance;
         public static T Instance
@@ -20,10 +20,6 @@ namespace MSFrame
             }
         }
         public virtual void Init() { }
-        public virtual void Dispose()
-        {
-            //GC
-        }
     }
 
 }
