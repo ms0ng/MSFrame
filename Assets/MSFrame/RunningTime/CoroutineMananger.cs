@@ -12,6 +12,8 @@ namespace MSFrame.RunningTime
         public Coroutine coroutine;
         public Action<CoroutineInfomation> onComplete;
         public bool isRunning;
+        public float startTime;
+        public float endTime;
 
         public CoroutineInfomation(string name, IEnumerator routine, Action<CoroutineInfomation> onComplete = null)
         {
@@ -64,8 +66,10 @@ namespace MSFrame.RunningTime
         private IEnumerator CoroutineHolder(CoroutineInfomation corInfo)
         {
             corInfo.isRunning = true;
+            corInfo.startTime = Time.realtimeSinceStartup;
             yield return base.StartCoroutine(corInfo.routine);
             corInfo.isRunning = false;
+            corInfo.endTime = Time.realtimeSinceStartup;
             corInfo.onComplete?.Invoke(corInfo);
 
             _coroutines.Remove(corInfo.nameHash);
