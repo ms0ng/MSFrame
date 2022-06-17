@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -263,6 +263,36 @@ namespace MSFrame
         {
             if (list.Count < 1) return default(T);
             return list[0];
+        }
+
+        public static bool IsSubClassOf(this Type type, Type targetType)
+        {
+            for (Type t = type; !t.Equals(typeof(object)); t = t.BaseType)
+            {
+                if (t.Equals(targetType)) return true;
+            }
+            return false;
+        }
+
+        public static T GetInstance<T>(this Type type, string propertyName = "Instance")
+        {
+            for (Type t = type; t != typeof(object); t = t.BaseType)
+            {
+                var property = t.GetProperty(propertyName);
+                if (property == null) continue;
+                var i = property.GetMethod.Invoke(null, null);
+                if (i != null) return (T)i;
+                break;
+            }
+            return default;
+        }
+
+        public static void UpwardAction(this Type type, Action<Type> action)
+        {
+            for (Type t = type; t != typeof(object); t = t.BaseType)
+            {
+                action.Invoke(t);
+            }
         }
     }
 }
